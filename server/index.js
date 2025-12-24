@@ -1,10 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import langchainService from './langchain-service.js';
-
-// 加载环境变量
-dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -37,7 +33,7 @@ app.post('/api/translate', async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   
   try {
-    const stream = langchainService.streamTranslation(text);
+    const stream = langchainService.translate(text);
     
     for await (const chunk of stream) {
       // 发送 SSE 格式数据
@@ -93,8 +89,8 @@ app.post('/api/chat', async (req, res) => {
     const systemPrompt = "You are a helpful AI assistant. Answer the user's questions clearly and concisely.";
     
     // 获取流式响应
-    const stream = langchainService.streamChat(query, history, systemPrompt);
-    
+    const stream = langchainService.chat(query, history, systemPrompt);
+
     let fullResponse = '';
     
     for await (const chunk of stream) {
@@ -133,23 +129,6 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
-// 非流式翻译端点（兼容旧客户端）
-app.post('/api/translate-non-stream', async (req, res) => {
-  const { text } = req.body;
-  
-  if (!text) {
-    return res.status(400).json({ error: '缺少文本参数' });
-  }
-  
-  try {
-    const result = await langchainService.translate(text);
-    res.json({ result });
-  } catch (error) {
-    console.error('非流式翻译错误:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
 // 清理会话历史端点
 app.delete('/api/session/:sessionId', (req, res) => {
   const { sessionId } = req.params;
@@ -169,6 +148,5 @@ app.listen(port, () => {
   console.log(`API 端点:`);
   console.log(`  POST /api/chat - SSE 聊天`);
   console.log(`  POST /api/translate - SSE 翻译`);
-  console.log(`  POST /api/translate-non-stream - 非流式翻译`);
   console.log(`  DELETE /api/session/:sessionId - 清理会话`);
 });

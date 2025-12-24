@@ -5,15 +5,12 @@
       <h1>AI 智能助手</h1>
       <div class="header-controls">
         <button @click="clearChat" class="btn-clear">清空对话</button>
-        <div class="model-info">
-          <span>模型: {{ modelName }}</span>
-        </div>
       </div>
     </header>
 
     <div class="main-content">
       <!-- 侧边栏（可选） -->
-      <aside class="sidebar" v-if="showSidebar">
+      <aside class="sidebar">
         <div class="sidebar-section">
           <h3>功能选择</h3>
           <div class="function-list">
@@ -29,37 +26,12 @@
           </div>
         </div>
         
-        <div class="sidebar-section">
-          <h3>会话管理</h3>
-          <input 
-            v-model="sessionId" 
-            placeholder="会话ID"
-            class="session-input"
-          />
-          <button @click="newSession" class="btn-new-session">新会话</button>
-        </div>
       </aside>
 
       <!-- 主聊天区域 -->
       <main class="chat-area">
         <!-- 消息列表 -->
         <div class="messages-container" ref="messagesContainer">
-          <div v-if="messages.length === 0" class="empty-state">
-            <div class="empty-icon">🤖</div>
-            <h3>欢迎使用 AI 助手</h3>
-            <p>选择功能开始对话，或直接输入问题</p>
-            <div class="quick-actions">
-              <button 
-                v-for="action in quickActions" 
-                :key="action.text"
-                @click="sendQuickAction(action.text)"
-                class="quick-action-btn"
-              >
-                {{ action.text }}
-              </button>
-            </div>
-          </div>
-
           <div v-for="(message, index) in messages" :key="index" class="message-wrapper">
             <!-- 用户消息 -->
             <div v-if="message.role === 'user'" class="message user-message">
@@ -112,14 +84,6 @@
         <!-- 输入区域 -->
         <div class="input-area">
           <div class="input-controls">
-            <button 
-              @click="toggleSidebar" 
-              class="sidebar-toggle"
-              :title="showSidebar ? '隐藏侧边栏' : '显示侧边栏'"
-            >
-              {{ showSidebar ? '◀' : '▶' }}
-            </button>
-            
             <div class="function-indicator" v-if="selectedFunction">
               当前功能: {{ getFunctionName(selectedFunction) }}
             </div>
@@ -159,22 +123,6 @@
       </main>
     </div>
 
-    <!-- 设置面板 -->
-    <div v-if="showSettings" class="settings-panel">
-      <div class="settings-content">
-        <h3>设置</h3>
-        <div class="settings-item">
-          <label>API 地址:</label>
-          <input v-model="apiBaseUrl" />
-        </div>
-        <div class="settings-item">
-          <label>会话 ID:</label>
-          <input v-model="sessionId" />
-        </div>
-        <button @click="showSettings = false">关闭</button>
-      </div>
-    </div>
-
     <!-- 通知 -->
     <transition name="fade">
       <div v-if="notification.show" class="notification" :class="notification.type">
@@ -192,11 +140,7 @@ import { marked } from 'marked'
 const messages = ref([])
 const inputText = ref('')
 const loading = ref(false)
-const showSidebar = ref(true)
-const showSettings = ref(false)
-const sessionId = ref('default')
 const apiBaseUrl = ref('http://localhost:3000')
-const modelName = ref('GPT-3.5 Turbo')
 const textareaRef = ref(null)
 const messagesContainer = ref(null)
 const copiedIndex = ref(-1)
@@ -257,11 +201,6 @@ function selectFunction(func) {
   }
 }
 
-function sendQuickAction(text) {
-  inputText.value = text
-  handleSend()
-}
-
 async function handleSend() {
   if (!canSend.value) {
     if (loading.value) {
@@ -306,7 +245,6 @@ async function handleSend() {
     let endpoint = '/api/chat'
     let body = { 
       query: text,
-      sessionId: sessionId.value
     }
     
     if (selectedFunction.value === 'translate') {
@@ -507,16 +445,6 @@ function clearChat() {
       timestamp: new Date()
     })
   }
-}
-
-function newSession() {
-  sessionId.value = 'session_' + Date.now()
-  clearChat()
-  showNotification(`新会话: ${sessionId.value}`, 'info')
-}
-
-function toggleSidebar() {
-  showSidebar.value = !showSidebar.value
 }
 
 async function copyToClipboard(content, index) {

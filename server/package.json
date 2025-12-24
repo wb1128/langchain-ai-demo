@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "serve": "dotenv -e .env node index.js"
+    "serve": "dotenv -e .env node index.js",
+    "dev:base": "dotenv -e .env node demo/base.js"
   },
   "type": "module",
   "keywords": [],
@@ -16,7 +17,9 @@
     "connect-timeout": "^1.9.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "langchain": "^1.2.3",
+    "zod": "^4.2.1"
   },
   "devDependencies": {
     "dotenv-cli": "^11.0.0"

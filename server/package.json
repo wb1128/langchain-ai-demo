@@ -4,7 +4,13 @@
   "main": "index.js",
   "scripts": {
     "serve": "dotenv -e .env node index.js",
-    "dev:demo": "dotenv -e .env node demo/demo.js"
+    "dev:model": "dotenv -e .env node demo/model.js",
+    "dev:prompt": "dotenv -e .env node demo/prompt.js",
+    "dev:memory": "dotenv -e .env node demo/memory.js",
+    "dev:tool": "dotenv -e .env node demo/tool.js",
+    "dev:chain": "dotenv -e .env node demo/chain.js",
+    "dev:agent": "dotenv -e .env node demo/agent.js",
+    "dev:weatherTool": "dotenv -e .env node demo/weatherTool.js"
   },
   "type": "module",
   "keywords": [],
@@ -12,6 +18,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@langchain/classic": "^1.0.7",
     "@langchain/community": "^1.1.1",
     "@langchain/core": "^1.1.8",
     "@langchain/langgraph": "^1.0.7",
